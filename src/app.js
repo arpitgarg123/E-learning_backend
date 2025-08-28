@@ -7,26 +7,28 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import helmet from 'helmet';   
-import rateLimit from 'express-rate-limit'                        
+import rateLimit from 'express-rate-limit' 
+import { env } from "./config/env.js";                          
 import {logger} from './shared/logger.js';
 
 // routers
 import userRouter from './modules/user/user.router.js'
+import authRouter from './modules/auth/auth.router.js'
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = env.PORT || 3000;
 
 
 app.use(helmet());
 app.use(cors({
-    origin: process.env.CLIENT_URL || '*',  
+    origin: env.CLIENT_URL || '*',  
   credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === "production") {
+if (env.NODE_ENV === "production") {
   app.use(morgan("combined")); 
 } else {
   app.use(morgan("dev")); 
@@ -45,14 +47,16 @@ app.get('/healthz', (_, res)=> res.json({
     uptime: process.uptime()
 }))
 
+app.use('/api/auth',authRouter)
 app.use('/api/user',userRouter)
+
 
 
 const start = async() =>{
     try {
         await connectDb()
         app.listen(port, () =>{
-            logger.info(`Server running on http://localhost:${process.env.PORT}`)
+            logger.info(`Server running on http://localhost:${env.PORT}`)
         })
     } catch (err) {
         logger.error("server failed to start", err)
@@ -60,6 +64,7 @@ const start = async() =>{
         
     }
 }
+
 // graceful shutdown
 process.on('SIGINT', ()=>{
     logger.info("SIGINT received, shutting down gracefully...");
