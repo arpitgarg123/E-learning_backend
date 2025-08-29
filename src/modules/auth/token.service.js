@@ -1,16 +1,10 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
-const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || "supersecretaccess";
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "supersecretrefresh";
-
-
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || 'supersecretaccess';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'supersecretrefresh';
 
 export const generateAccessToken = (user) => {
-  return jwt.sign(
-    { id: user._id, role: user.role }, 
-    JWT_ACCESS_SECRET,
-    { expiresIn: "15m" }
-  );
+  return jwt.sign({ id: user._id, role: user.role }, JWT_ACCESS_SECRET, { expiresIn: '15m' });
 };
 
 // Generate Refresh Token (long-lived)
@@ -18,17 +12,13 @@ export const generateRefreshToken = (user) => {
   return jwt.sign(
     { id: user._id },
     JWT_REFRESH_SECRET,
-    { expiresIn: "7d" }  // long expiry (7 days)
+    { expiresIn: '7d' } // long expiry (7 days)
   );
 };
 
 // Verify Access Token
 export const verifyAccessToken = (token) => {
-  try {
-    return jwt.verify(token, JWT_ACCESS_SECRET);
-  } catch (err) {
-    return null;
-  }
+  return jwt.verify(token, JWT_ACCESS_SECRET);
 };
 
 // Verify Refresh Token
@@ -41,22 +31,22 @@ export const verifyRefreshToken = (token) => {
 };
 
 export const setAuthCookies = (res, accessToken, refreshToken) => {
-  res.cookie("token", accessToken, {
+  res.cookie('token', accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
     maxAge: 15 * 60 * 1000, // 15m
   });
 
-  res.cookie("refreshToken", refreshToken, {
+  res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
   });
 };
 
 export const clearAuthCookies = (res) => {
-  res.clearCookie("token");
-  res.clearCookie("refreshToken");
+  res.clearCookie('token');
+  res.clearCookie('refreshToken');
 };
