@@ -22,8 +22,11 @@ const courseSchema = new mongoose.Schema(
 
     instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     lectures: [lectureSchema],
-
-    isPublished: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ['draft', 'pending_approval', 'published', 'rejected'],
+      default: 'draft',
+    },
     studentsEnrolled: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
     tags: [{ type: String }],

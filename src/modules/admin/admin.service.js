@@ -1,3 +1,4 @@
+import Course from '../courses/course.model.js';
 import User from '../user/user.model.js';
 
 export const getInstructorRequestsService = async () => {
@@ -22,4 +23,31 @@ export const reviewInstructorRequestService = async (adminId, userId, action) =>
 
   await user.save();
   return user;
+};
+
+// get all courses requests
+
+export const getAllPendingCourseRequestService = async () => {
+  const courses = await Course.find({ status: 'pending_approval' })
+    .populate('instructor', 'name email')
+    .sort({ createdAt: -1 });
+
+  return courses;
+};
+
+// Admin reviews course
+export const reviewCourseService = async (courseId, action) => {
+  const course = await Course.findById(courseId);
+  if (!course) throw new Error('Course not found');
+
+  if (action === 'approve') {
+    course.status = 'published';
+  } else if (action === 'reject') {
+    course.status = 'rejected';
+  } else {
+    throw new Error('Invalid action');
+  }
+
+  await course.save();
+  return course;
 };

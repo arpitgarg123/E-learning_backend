@@ -1,7 +1,14 @@
 import { imagekit } from '../../config/imagekit.js';
 import { asyncHandler } from '../../shared/utlis/asyncHandler.js';
 import { uploadToImageKit } from '../../shared/utlis/uploader.js';
-import { addLectureService, createCourseService } from './course.service.js';
+import {
+  createCourseService,
+  deleteCourseService,
+  getAllCourseService,
+  getCourseService,
+  requestPublishService,
+  updateCourseService,
+} from './course.service.js';
 
 export const createCourse = asyncHandler(async (req, res) => {
   const { title, description, category, level, price, discount, tags } = req.body;
@@ -36,28 +43,63 @@ export const createCourse = asyncHandler(async (req, res) => {
 });
 
 // Additional controllers like getCourse, updateCourse, deleteCourse can be added here
-
-// adding the controller of adding lectures
-export const addLecture = asyncHandler(async (req, res) => {
+export const updateCourse = asyncHandler(async (req, res) => {
   const { courseId } = req.params;
-  const { title, description, duration } = req.body;
-
-  let videoUrl = '';
+  const { title, description, category, level, price, discount, tags } = req.body;
+  let thumbnailUrl = '';
   if (req.file) {
-    videoUrl = await uploadToImageKit(req.file);
+    const uploadResponse = await uploadToImageKit(req.file);
+    thumbnailUrl = uploadResponse.url;
   }
-
-  const updatedCourse = await addLectureService(courseId, {
+  const updatedCourse = await updateCourseService(courseId, {
     title,
     description,
-    videoUrl,
-    duration,
+    category,
+    level,
+    price,
+    thumbnail: thumbnailUrl,
+    discount,
+    tags,
   });
-
   res.status(200).json({
-    message: 'Lecture added successfully',
+    message: 'Course updated successfully',
     course: updatedCourse,
   });
 });
 
-// additional controllers like getLecture, updateLecture, deleteLecture can be added here
+export const requestPublishCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const instructorId = req.user.id;
+
+  const course = await requestPublishService(courseId, instructorId);
+
+  res.status(200).json({
+    message: 'Course submitted for admin approval',
+    course,
+  });
+});
+
+export const getCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const course = await getCourseService(courseId);
+  res.status(200).json({
+    message: 'Course retrieved successfully',
+    course,
+  });
+});
+
+export const getAllCourse = asyncHandler(async (req, res) => {
+  const courses = await getAllCourseService(req.user, req.query);
+  res.status(200).json({
+    message: 'All courses retrieved successfully',
+    courses,
+  });
+});
+
+export const deleteCourse = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  await deleteCourseService(courseId);
+  res.status(200).json({
+    message: 'Course deleted successfully',
+  });
+});

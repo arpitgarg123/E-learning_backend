@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { authorize } from '../../middlewares/authorize.js';
-import { getInstructorRequests, reviewInstructorRequest } from './admin.controller.js';
+import {
+  getAllCourseRequests,
+  getInstructorRequests,
+  reviewCourse,
+  reviewInstructorRequest,
+} from './admin.controller.js';
 import { authenticated } from '../../middlewares/authentication.js';
 
 const router = Router();
@@ -15,5 +20,8 @@ router.post(
   authorize('admin'),
   reviewInstructorRequest
 );
+// review course
+router.get('/course-requests', authenticated, authorize('admin'), getAllCourseRequests);
+router.patch('/:courseId/review', authenticated, authorize('admin'), reviewCourse);
 
 export default router;
