@@ -51,6 +51,24 @@ export const getAllLectureService = async (courseId) => {
   }
 };
 
+export const getCompletedLessonsService = async (courseId, studentId) => {
+  const enrollment = await Enrollment.findOne({
+    student: studentId,
+    course: courseId,
+    paymentStatus: 'completed',
+  });
+  if (!enrollment) {
+    return res.status(403).json({ message: 'Not enrolled in this course' });
+  }
+
+  if (enrollment.progress.completedLessons < enrollment.progress.totalLessons) {
+    enrollment.progress.completedLessons += 1;
+  }
+  await enrollment.save();
+
+  return enrollment.progress;
+};
+
 export const deleteLectureService = async (courseId, lectureId) => {
   try {
     const course = await Course.findById(courseId);

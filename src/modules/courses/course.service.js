@@ -1,3 +1,4 @@
+import Enrollment from '../enrollment/enrollment.model.js';
 import Course from './course.model.js';
 
 export const createCourseService = async (data) => {
@@ -76,7 +77,25 @@ export const getAllCourseService = async (user, filters) => {
 
   return await Course.find(query).populate('instructor', 'name email');
 };
-
+export const getMyCoursesService = async (userId) => {
+  const enrollments = await Enrollment.find({
+    student: userId,
+    paymentStatus: 'completed',
+  }).populate('course', 'title thumbnail category instructor');
+  return enrollments;
+};
+export const getEnrolledCourseService = async (userId, courseId) => {
+  const enrollment = await Enrollment.findOne({
+    student: userId,
+    course: courseId,
+    paymentStatus: 'completed',
+  });
+  if (!enrollment) {
+    return res.status(403).json({ message: 'You are not enrolled in this course' });
+  }
+  const course = await Course.findById(courseId).select('title description lectures');
+  return course;
+};
 export const deleteCourseService = async (courseId) => {
   try {
     await Course.findByIdAndDelete(courseId);

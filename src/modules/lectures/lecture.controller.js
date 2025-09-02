@@ -56,6 +56,16 @@ export const getAllLecture = asyncHandler(async (req, res) => {
   });
 });
 
+export const completeLecture = asyncHandler(async (req, res) => {
+  const { courseId } = req.params;
+  const studentId = req.user.id;
+  const completedLessons = await getCompletedLessonsService(courseId, studentId);
+  res.status(200).json({
+    message: 'Lecture completed successfully',
+    progress: enrollment.progress,
+  });
+});
+
 export const deleteLecture = asyncHandler(async (req, res) => {
   const { courseId, lectureId } = req.params;
 

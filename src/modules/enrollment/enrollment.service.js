@@ -2,22 +2,28 @@ import Course from '../courses/course.model.js';
 import Enrollment from './enrollment.model.js';
 import crypto from 'crypto';
 import { razorpay } from '../../config/razorpay.js';
+import { logger } from '../../shared/logger.js';
 
 export const enrollCourseService = async ({ studentId, courseId }) => {
   const course = await Course.findById(courseId);
   if (!course) throw new error('Course not found');
 
   const existing = await Enrollment.findOne({ course: courseId, student: studentId });
-  if (existing && existing.paymentStatus === 'completed') {
-    throw new Error('Already enrolled in this course');
-  }
 
+  if (existing) {
+    if (existing.paymentStatus === 'completed') {
+      throw new Error('Already enrolled in this course');
+    }
+    if (existing.paymentStatus === 'pending') {
+      throw new Error('Payment already in progress for this course');
+    }
+  }
   // Free course instant enrollment
   if (course.price === 0) {
     const enrollment = await Enrollment.create({
       student: studentId,
       course: courseId,
-      paymentStatus: 'free',
+      paymentStatus: 'completed',
       progress: { totalLessons: course.lectures.length },
     });
 
@@ -44,7 +50,7 @@ export const enrollCourseService = async ({ studentId, courseId }) => {
   return { enrollment, order };
 };
 
-// 📌 Service to verify Razorpay payment
+//  Service to verify Razorpay payment
 export const verifyPaymentService = async ({
   enrollmentId,
   razorpay_order_id,

@@ -6,6 +6,8 @@ import {
   deleteCourseService,
   getAllCourseService,
   getCourseService,
+  getEnrolledCourseService,
+  getMyCoursesService,
   requestPublishService,
   updateCourseService,
 } from './course.service.js';
@@ -92,6 +94,25 @@ export const getAllCourse = asyncHandler(async (req, res) => {
   const courses = await getAllCourseService(req.user, req.query);
   res.status(200).json({
     message: 'All courses retrieved successfully',
+    courses,
+  });
+});
+
+export const getMyCourses = asyncHandler(async (req, res) => {
+  const studentId = req.user.id;
+  const enrollments = await getMyCoursesService(studentId);
+  res.status(200).json({
+    message: 'My courses retrieved successfully',
+    courses: enrollments,
+  });
+});
+
+export const getEnrolledCourse = asyncHandler(async (req, res) => {
+  const studentId = req.user.id;
+  const { courseId } = req.params;
+  const courses = await getEnrolledCourseService(studentId, courseId);
+  res.status(200).json({
+    message: 'Enrolled courses retrieved successfully',
     courses,
   });
 });

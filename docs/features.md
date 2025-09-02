@@ -4,6 +4,8 @@
 
 # Login ✅
 
+# logout ✅
+
 # # admin Features
 
 # instructor-request views ✅
@@ -36,6 +38,10 @@
 
 # getbyid Course ✅
 
+# get all enrolled Courses ✅
+
+# get my enrolled Courses ✅
+
 # delete Course ✅
 
 # # Lectures Feature
@@ -53,3 +59,9 @@
 # user enroll ✅
 
 # payment verification ✅
+
+# # assignment Create
+
+# create assignment ✅
+
+# submit answers of the quiz ✅

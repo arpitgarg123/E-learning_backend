@@ -18,7 +18,8 @@ import adminRouter from './modules/admin/admin.router.js';
 import courseRouter from './modules/courses/course.router.js';
 import lectureRouter from './modules/lectures/lecture.router.js';
 import enrollmentRouter from './modules/enrollment/enrollment.router.js';
-
+import quizRouter from './modules/assignment/quiz.router.js';
+import { errorHandler } from './shared/utlis/errorHandler.js';
 const app = express();
 const port = env.PORT || 3000;
 
@@ -60,6 +61,8 @@ app.use('/api/admin', adminRouter);
 app.use('/api/course', courseRouter);
 app.use('/api/lecture', lectureRouter);
 app.use('/api/enrollment', enrollmentRouter);
+app.use('/api/quiz', quizRouter);
+app.use(errorHandler);
 
 const start = async () => {
   try {

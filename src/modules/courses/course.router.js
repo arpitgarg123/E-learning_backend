@@ -5,11 +5,14 @@ import {
   deleteCourse,
   getAllCourse,
   getCourse,
+  getEnrolledCourse,
+  getMyCourses,
   requestPublishCourse,
   updateCourse,
 } from './course.controller.js';
 import { authorize } from '../../middlewares/authorize.js';
 import upload from '../../shared/utlis/multer.js';
+import { checkEnrollment } from '../../middlewares/enrolledChecker.js';
 
 const router = Router();
 
@@ -31,6 +34,8 @@ router.patch(
 );
 router.get('/', authenticated, getAllCourse);
 router.get('/:courseId', authenticated, getCourse);
+router.get('/get/my-courses', authenticated, getMyCourses);
+router.get('/enrolled/:courseId', authenticated, checkEnrollment, getEnrolledCourse);
 router.delete('/delete/:courseId', authenticated, authorize('instructor'), deleteCourse);
 
 export default router;
