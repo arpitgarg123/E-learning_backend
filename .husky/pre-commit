@@ -1,3 +1,0 @@
-
-# Run lint-staged (or prettier/eslint) instead of npm test
-npx lint-staged
